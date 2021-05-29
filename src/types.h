@@ -202,16 +202,6 @@ enum Value : int {
   BishopValueMg     = 826,  BishopValueEg     = 891,
   RookValueMg       = 1282, RookValueEg       = 1373,
   QueenValueMg      = 2500, QueenValueEg      = 2670,
-  CannonValueMg     = 1710, CannonValueEg     = 2239,
-  LeopardValueMg    = 1648, LeopardValueEg    = 2014,
-  ArchbishopValueMg = 2036, ArchbishopValueEg = 2202,
-  ChancellorValueMg = 2251, ChancellorValueEg = 2344,
-  SpiderValueMg     = 2321, SpiderValueEg     = 2718,
-  DragonValueMg     = 3280, DragonValueEg     = 2769,
-  UnicornValueMg    = 1584, UnicornValueEg    = 1772,
-  HawkValueMg       = 1537, HawkValueEg       = 1561,
-  ElephantValueMg   = 1770, ElephantValueEg   = 2000,
-  FortressValueMg   = 1956, FortressValueEg   = 2100,
 
   MidgameLimit  = 15258, EndgameLimit  = 3915
 };

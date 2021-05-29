@@ -21,12 +21,9 @@
 #include <algorithm>
 
 #include "types.h"
+#include "uci.h"
 
-Value PieceValue[PHASE_NB][PIECE_NB] = {
-  { VALUE_ZERO, PawnValueMg, KnightValueMg, BishopValueMg, RookValueMg, QueenValueMg, CannonValueMg, LeopardValueMg, ArchbishopValueMg, ChancellorValueMg, SpiderValueMg, DragonValueMg, UnicornValueMg, HawkValueMg, ElephantValueMg, FortressValueMg },
-  { VALUE_ZERO, PawnValueEg, KnightValueEg, BishopValueEg, RookValueEg, QueenValueEg, CannonValueEg, LeopardValueEg, ArchbishopValueEg, ChancellorValueEg, SpiderValueEg, DragonValueEg, UnicornValueEg, HawkValueEg, ElephantValueEg, FortressValueEg }
-};
-
+Value PieceValue[PHASE_NB][PIECE_NB];
 namespace PSQT {
 
 #define S(mg, eg) make_score(mg, eg)
@@ -206,7 +203,41 @@ Score psq_gate[PIECE_NB][FILE_NB];
 // init() initializes piece-square tables: the white halves of the tables are
 // copied from Bonus[] adding the piece value, then the black halves of the
 // tables are initialized by flipping and changing the sign of the white scores.
-void init() {
+
+void init() {  
+  PieceValue[MG][NO_PIECE_TYPE] = VALUE_ZERO;
+  PieceValue[MG][PAWN] = PawnValueMg;
+  PieceValue[MG][KNIGHT] = KnightValueMg;
+  PieceValue[MG][BISHOP] = BishopValueMg;
+  PieceValue[MG][ROOK] = RookValueMg;
+  PieceValue[MG][QUEEN] = QueenValueMg;
+  PieceValue[MG][CANNON] = Value(int(Options["CannonValueMg"]));
+  PieceValue[MG][LEOPARD] = Value(int(Options["LeopardValueMg"]));
+  PieceValue[MG][ARCHBISHOP] = Value(int(Options["ArchbishopValueMg"]));
+  PieceValue[MG][CHANCELLOR] = Value(int(Options["ChancellorValueMg"]));
+  PieceValue[MG][SPIDER] = Value(int(Options["SpiderValueMg"]));
+  PieceValue[MG][DRAGON] = Value(int(Options["DragonValueMg"]));
+  PieceValue[MG][UNICORN] = Value(int(Options["UnicornValueMg"]));
+  PieceValue[MG][HAWK] = Value(int(Options["HawkValueMg"]));
+  PieceValue[MG][ELEPHANT] = Value(int(Options["ElephantValueMg"]));
+  PieceValue[MG][FORTRESS] = Value(int(Options["FortressValueMg"]));
+
+  PieceValue[EG][NO_PIECE_TYPE] = VALUE_ZERO;
+  PieceValue[EG][PAWN] = PawnValueEg;
+  PieceValue[EG][KNIGHT] = KnightValueEg;
+  PieceValue[EG][BISHOP] = BishopValueEg;
+  PieceValue[EG][ROOK] = RookValueEg;
+  PieceValue[EG][QUEEN] = QueenValueEg;
+  PieceValue[EG][CANNON] = Value(int(Options["CannonValueEg"]));
+  PieceValue[EG][LEOPARD] = Value(int(Options["LeopardValueEg"]));
+  PieceValue[EG][ARCHBISHOP] = Value(int(Options["ArchbishopValueEg"]));
+  PieceValue[EG][CHANCELLOR] = Value(int(Options["ChancellorValueEg"]));
+  PieceValue[EG][SPIDER] = Value(int(Options["SpiderValueEg"]));
+  PieceValue[EG][DRAGON] = Value(int(Options["DragonValueEg"]));
+  PieceValue[EG][UNICORN] = Value(int(Options["UnicornValueEg"]));
+  PieceValue[EG][HAWK] = Value(int(Options["HawkValueEg"]));
+  PieceValue[EG][ELEPHANT] = Value(int(Options["ElephantValueEg"]));
+  PieceValue[EG][FORTRESS] = Value(int(Options["FortressValueEg"]));
 
   for (PieceType pt = PAWN; pt <= KING; ++pt)
   {

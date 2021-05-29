@@ -35,6 +35,10 @@ using std::string;
 
 UCI::OptionsMap Options; // Global object
 
+namespace PSQT {
+  void init();
+}
+
 namespace UCI {
 
 /// 'On change' actions, triggered by an option's value change
@@ -43,6 +47,7 @@ void on_hash_size(const Option& o) { TT.resize(o); }
 void on_logger(const Option& o) { start_logger(o); }
 void on_threads(const Option& o) { Threads.set(o); }
 void on_tb_path(const Option& o) { Tablebases::init(o); }
+void on_piece_value(const Option&) { PSQT::init(); }
 void on_variant(const Option& o) {
     if (Options["Protocol"] == "xboard")
     {
@@ -112,6 +117,26 @@ void init(OptionsMap& o) {
   o["SyzygyProbeDepth"]      << Option(1, 1, 100);
   o["Syzygy50MoveRule"]      << Option(true);
   o["SyzygyProbeLimit"]      << Option(6, 0, 6);
+  o["CannonValueMg"]         << Option(1710, 710, 2710, on_piece_value);
+  o["CannonValueEg"]         << Option(2239, 1239, 3239, on_piece_value);
+  o["LeopardValueMg"]        << Option(1648, 648, 2648, on_piece_value);
+  o["LeopardValueEg"]        << Option(2014, 1014, 3014, on_piece_value);
+  o["ArchbishopValueMg"]     << Option(2036, 1036, 3036, on_piece_value);
+  o["ArchbishopValueEg"]     << Option(2202, 1202, 3202, on_piece_value);
+  o["ChancellorValueMg"]     << Option(2251, 1251, 3251, on_piece_value);
+  o["ChancellorValueEg"]     << Option(2344, 1344, 3344, on_piece_value);
+  o["SpiderValueMg"]         << Option(2321, 1321, 3321, on_piece_value);
+  o["SpiderValueEg"]         << Option(2718, 1718, 3718, on_piece_value);
+  o["DragonValueMg"]         << Option(3280, 2280, 4280, on_piece_value);
+  o["DragonValueEg"]         << Option(2769, 1769, 3769, on_piece_value);
+  o["UnicornValueMg"]        << Option(1584, 584, 2584, on_piece_value);
+  o["UnicornValueEg"]        << Option(1772, 772, 2772, on_piece_value);
+  o["HawkValueMg"]           << Option(1537, 537, 2537, on_piece_value);
+  o["HawkValueEg"]           << Option(1561, 561, 2561, on_piece_value);
+  o["ElephantValueMg"]       << Option(1770, 770, 2770, on_piece_value);
+  o["ElephantValueEg"]       << Option(2000, 1000, 3000, on_piece_value);
+  o["FortressValueMg"]       << Option(1956, 956, 2956, on_piece_value);
+  o["FortressValueEg"]       << Option(2100, 1100, 3100, on_piece_value);
 }
 
 
