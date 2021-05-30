@@ -50,6 +50,20 @@ namespace Tablebases {
   Depth ProbeDepth;
 }
 
+namespace {
+
+  int futilityMargin;
+  int futilityImprovingFactor;
+  int qSearchFutilityMargin;
+  int lateMoveReductionFactor;
+  int nullMoveReductionBaseFactor;
+  int nullMoveReductionDepthFactor;
+  int nullMoveEvalDepthFactor;
+  int nullMoveEvalBias;
+  int futilityMoveCountPoorEvalFactor;
+  int futilityMoveCountGoodEvalFactor;
+}
+
 namespace TB = Tablebases;
 
 using std::string;
@@ -68,7 +82,7 @@ namespace {
   // Razor and futility margins
   constexpr int RazorMargin[] = {0, 590, 604};
   Value futility_margin(Depth d, bool improving) {
-    return Value((175 - 50 * improving) * d / ONE_PLY);
+    return Value((futilityMargin - futilityImprovingFactor * improving) * d / ONE_PLY);
   }
 
   // Futility and reductions lookup tables, initialized at startup
@@ -145,12 +159,22 @@ namespace {
 /// Search::init() is called at startup to initialize various lookup tables
 
 void Search::init() {
+  futilityMargin = Options["FutilityMargin"];
+  futilityImprovingFactor = Options["FutilityImprovingFactor"];
+  qSearchFutilityMargin = Options["QSearchFutilityMargin"];
+  lateMoveReductionFactor = Options["LateMoveReductionFactor"];
+  nullMoveReductionBaseFactor = Options["NullMoveReductionBaseFactor"];
+  nullMoveReductionDepthFactor = Options["NullMoveReductionDepthFactor"];
+  nullMoveEvalDepthFactor = Options["NullMoveEvalDepthFactor"];
+  nullMoveEvalBias = Options["NullMoveEvalBias"];
+  futilityMoveCountPoorEvalFactor = Options["FutilityMoveCountPoorEvalFactor"];
+  futilityMoveCountGoodEvalFactor = Options["FutilityMoveCountGoodEvalFactor"];
 
   for (int imp = 0; imp <= 1; ++imp)
       for (int d = 1; d < 64; ++d)
           for (int mc = 1; mc < 64; ++mc)
           {
-              double r = log(d) * log(mc) / 1.95;
+              double r = log(d) * log(mc) / (double(lateMoveReductionFactor) / 100);
 
               Reductions[NonPV][imp][d][mc] = int(std::round(r));
               Reductions[PV][imp][d][mc] = std::max(Reductions[NonPV][imp][d][mc] - 1, 0);
@@ -162,8 +186,8 @@ void Search::init() {
 
   for (int d = 0; d < 16; ++d)
   {
-      FutilityMoveCounts[0][d] = int(2.4 + 0.74 * pow(d, 1.78));
-      FutilityMoveCounts[1][d] = int(5.0 + 1.00 * pow(d, 2.00));
+      FutilityMoveCounts[0][d] = int(2.4 + double(futilityMoveCountPoorEvalFactor)/100 * pow(d, 1.78));
+      FutilityMoveCounts[1][d] = int(5.0 + double(futilityMoveCountGoodEvalFactor)/100 * pow(d, 2.00));
   }
 }
 
@@ -751,7 +775,7 @@ namespace {
         && (ss-1)->currentMove != MOVE_NULL
         && (ss-1)->statScore < 22500
         &&  eval >= beta
-        &&  ss->staticEval >= beta - 36 * depth / ONE_PLY + 225
+        &&  ss->staticEval >= beta - nullMoveEvalDepthFactor * depth / ONE_PLY + nullMoveEvalBias
         && !excludedMove
         &&  pos.non_pawn_material(us)
         && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
@@ -759,7 +783,7 @@ namespace {
         assert(eval - beta >= 0);
 
         // Null move dynamic reduction based on depth and value
-        Depth R = ((823 + 67 * depth / ONE_PLY) / 256 + std::min((eval - beta) / PawnValueMg, 3)) * ONE_PLY;
+        Depth R = ((nullMoveReductionBaseFactor + nullMoveReductionDepthFactor * depth / ONE_PLY) / 256 + std::min((eval - beta) / PawnValueMg, 3)) * ONE_PLY;
 
         ss->currentMove = MOVE_NULL;
         ss->contHistory = thisThread->contHistory[NO_PIECE][0].get();
@@ -1291,7 +1315,7 @@ moves_loop: // When in check, search starts from here
         if (PvNode && bestValue > alpha)
             alpha = bestValue;
 
-        futilityBase = bestValue + 128;
+        futilityBase = bestValue + qSearchFutilityMargin;
     }
 
     // Initialize a MovePicker object for the current position, and prepare
